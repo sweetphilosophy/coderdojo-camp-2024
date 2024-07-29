@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pong</title>
+    <style>
+      #gameContainer {
+        position: relative;
+        width: 800px;
+        height: 400px;
+        border: 1px solid black;
+        margin: 0 auto;
+        background-color: #000;
+      }
+      .paddle {
+        position: absolute;
+        width: 75px;
+        height: 10px;
+        background-color: #0095dd;
+      }
+      #paddle1 {
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+      #ball {
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        background-color: #0095dd;
+        border-radius: 50%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="gameContainer">
+      <div id="paddle1" class="paddle"></div>
+      <div id="ball"></div>
+    </div>
+    <script>
+      const gameContainer = document.getElementById("gameContainer");
+      const paddle1 = document.getElementById("paddle1");
+      const ball = document.getElementById("ball");
+
+      const containerWidth = gameContainer.clientWidth;
+      const containerHeight = gameContainer.clientHeight;
+      const paddleWidth = paddle1.clientWidth;
+      const paddleHeight = paddle1.clientHeight;
+      const ballDiameter = ball.clientWidth;
+
+      let rightPressed = false;
+      let leftPressed = false;
+
+      let ballX = containerWidth / 2 - ballDiameter / 2;
+      let ballY = containerHeight - paddleHeight - ballDiameter;
+      let dx = 1;
+      let dy = -1;
+      let paddleX = (containerWidth - paddleWidth) / 2;
+
+      function drawPaddle() {
+        paddle1.style.left = `${paddleX}px`;
+      }
+
+      function drawBall() {
+        ball.style.left = `${ballX}px`;
+        ball.style.top = `${ballY}px`;
+      }
+
+      function movePaddle() {
+        if (rightPressed && paddleX < containerWidth - paddleWidth) {
+          paddleX += 4;
+        } else if (leftPressed && paddleX > 0) {
+          paddleX -= 4;
+        }
+      }
+
+      function moveBall() {
+        ballX += dx;
+        ballY += dy;
+
+        if (ballX + ballDiameter > containerWidth || ballX < 0) {
+          dx = -dx;
+        }
+        if (ballY < 0) {
+          dy = -dy;
+        } else if (ballY + ballDiameter > containerHeight - paddleHeight) {
+          if (ballX + ballDiameter > paddleX && ballX < paddleX + paddleWidth) {
+            dy = -dy;
+          } else if (ballY + ballDiameter > containerHeight) {
+            alert("Game Over");
+            ballX = containerWidth / 2 - ballDiameter / 2;
+            ballY = containerHeight - paddleHeight - ballDiameter;
+            document.location.reload();
+          }
+        }
+      }
+
+      function gameLoop() {
+        movePaddle();
+        moveBall();
+        drawPaddle();
+        drawBall();
+        requestAnimationFrame(gameLoop);
+      }
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Right" || e.key === "ArrowRight") {
+          rightPressed = true;
+        } else if (e.key === "Left" || e.key === "ArrowLeft") {
+          leftPressed = true;
+        }
+      });
+
+      document.addEventListener("keyup", (e) => {
+        if (e.key === "Right" || e.key === "ArrowRight") {
+          rightPressed = false;
+        } else if (e.key === "Left" || e.key === "ArrowLeft") {
+          leftPressed = false;
+        }
+      });
+
+      gameLoop();
+    </script>
+  </body>
+</html>
